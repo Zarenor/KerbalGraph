@@ -656,7 +656,18 @@ namespace KerbalGraph
 
         #endregion
 
+        #region Data Dump Functions
 
+        public void DumpDataToCSV(string fileName, List<string> linesToDump)
+        {
+
+
+
+
+
+        }
+
+        #endregion
 
         /// <summary>
         /// This displays the graph.
