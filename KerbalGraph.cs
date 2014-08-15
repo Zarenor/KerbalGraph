@@ -46,6 +46,7 @@ namespace KerbalGraph
             private double horizontalScaling;
 
             #region Constructor
+
             public KerbalGraphLine(int width, int height)
             {
                 lineDisplay = new Texture2D(width, height, TextureFormat.ARGB32, false);
@@ -56,8 +57,8 @@ namespace KerbalGraph
                 horizontalScaling = 1;
             }
 
-
             #endregion
+
             #region InputData
 
 
@@ -80,7 +81,6 @@ namespace KerbalGraph
                         MonoBehaviour.print("Warning: NaN in yValues array; value set to zero");
                     }
                 }
-//                MonoBehaviour.print("Raw Data Arrays Initialized...");
 
                 rawDataX = xValues;
                 rawDataY = yValues;
@@ -99,7 +99,7 @@ namespace KerbalGraph
                 double yScaling = lineDisplay.height / (bounds.w - bounds.z);
                 double tmpx, tmpy;
 
-                for(int i = 0; i < rawDataX.Length; i++)
+                for (int i = 0; i < rawDataX.Length; i++)
                 {
                     tmpx = rawDataX[i] * horizontalScaling;
                     tmpy = rawDataY[i] * verticalScaling;
@@ -113,12 +113,13 @@ namespace KerbalGraph
                     tmpx = Math.Round(tmpx);
                     tmpy = Math.Round(tmpy);
 
-//                    MonoBehaviour.print("x: " + tmpx.ToString() + " y: " + tmpy.ToString());
+                    //                    MonoBehaviour.print("x: " + tmpx.ToString() + " y: " + tmpy.ToString());
                     pixelDataX[i] = (int)tmpx;
                     pixelDataY[i] = (int)tmpy;
                 }
                 Update();
             }
+
             #endregion
 
             public void SetBoundaries(Vector4 boundaries)
@@ -138,7 +139,7 @@ namespace KerbalGraph
                 if (lineThickness < 1)
                     lineThickness = 1;
 
-                for(int k = 0; k < pixelDataX.Length; k++)
+                for (int k = 0; k < pixelDataX.Length; k++)
                 {
                     int tmpx = pixelDataX[k];
                     int tmpy = pixelDataY[k];
@@ -168,7 +169,7 @@ namespace KerbalGraph
                                 for (int j = -tmpThick; j <= tmpThick; j++)
                                 {
                                     int linear = (int)Math.Round(m * (i - xend) + yend);
-                                    if((i >= 0 && i <= lineDisplay.width) && (linear + j >= 0 && linear + j <= lineDisplay.height))
+                                    if ((i >= 0 && i <= lineDisplay.width) && (linear + j >= 0 && linear + j <= lineDisplay.height))
                                         lineDisplay.SetPixel(i, linear + j, lineColor);
                                 }
                         }
@@ -277,7 +278,19 @@ namespace KerbalGraph
 
 
         protected Texture2D graph;
-        protected Rect displayRect = new Rect(0, 0, 0, 0);
+
+        /// <summary>
+        /// The rectangle the graph is calculated ('drawn') onto. NOT necessarily the same size as displayed.
+        /// </summary>
+        protected Rect drawRect = new Rect(0, 0, 0, 0);
+
+        /// <summary>
+        /// The rectangle used for displaying the graph. NOT necessarily the same as the one the graph was drawn to.
+        /// </summary>
+        private Rect displayRect = new Rect(0, 0, 0, 0);
+
+        private bool refreshFlag = true;
+
 
         private Dictionary<string, KerbalGraphLine> allLines = new Dictionary<string, KerbalGraphLine>();
 
@@ -301,7 +314,7 @@ namespace KerbalGraph
         {
             graph = new Texture2D(width, height, TextureFormat.ARGB32, false);
             SetBoundaries(0, 1, 0, 1);
-            displayRect = new Rect(1, 1, graph.width, graph.height);
+            drawRect = new Rect(1, 1, graph.width, graph.height);
             GridInit();
         }
 
@@ -309,7 +322,7 @@ namespace KerbalGraph
         {
             graph = new Texture2D(width, height, TextureFormat.ARGB32, false);
             SetBoundaries(minx, maxx, miny, maxy);
-            displayRect = new Rect(1, 1, graph.width, graph.height);
+            drawRect = new Rect(1, 1, graph.width, graph.height);
             GridInit();
         }
         #endregion
@@ -346,8 +359,8 @@ namespace KerbalGraph
         {
             int pixelWidth, pixelHeight;
 
-            pixelWidth = (int)Math.Round(((gridWidth * displayRect.width) / (bounds.y - bounds.x)));
-            pixelHeight = (int)Math.Round(((gridHeight * displayRect.height) / (bounds.w - bounds.z)));
+            pixelWidth = (int)Math.Round(((gridWidth * drawRect.width) / (bounds.y - bounds.x)));
+            pixelHeight = (int)Math.Round(((gridHeight * drawRect.height) / (bounds.w - bounds.z)));
 
             if (pixelWidth <= 1)
             {
@@ -361,7 +374,7 @@ namespace KerbalGraph
             }
 
             SetGridScaleUsingPixels(pixelWidth, pixelHeight);
-            
+
 
         }
 
@@ -395,6 +408,7 @@ namespace KerbalGraph
         }
 
         #endregion
+
         #region GridInit
 
         private void GridInit()
@@ -409,8 +423,8 @@ namespace KerbalGraph
 
             int horizontalAxis, verticalAxis;
 
-            horizontalAxis = (int)Math.Round(-bounds.x * displayRect.width / (bounds.y - bounds.x));
-            verticalAxis = (int)Math.Round(-bounds.z * displayRect.height / (bounds.w - bounds.z));
+            horizontalAxis = (int)Math.Round(-bounds.x * drawRect.width / (bounds.y - bounds.x));
+            verticalAxis = (int)Math.Round(-bounds.z * drawRect.height / (bounds.w - bounds.z));
 
             for (int i = 0; i < graph.width; i++)
             {
@@ -440,7 +454,7 @@ namespace KerbalGraph
                 MonoBehaviour.print("Error: A Line with that name already exists");
                 return;
             }
-            KerbalGraphLine newLine = new KerbalGraphLine((int)displayRect.width, (int)displayRect.height);
+            KerbalGraphLine newLine = new KerbalGraphLine((int)drawRect.width, (int)drawRect.height);
             newLine.SetBoundaries(bounds);
             allLines.Add(lineName, newLine);
             Update();
@@ -462,7 +476,7 @@ namespace KerbalGraph
         {
             Color lineColor = Color.red;
             AddLine(lineName, xValues, yValues, lineColor, lineThickness);
-        }        
+        }
 
         public void AddLine(string lineName, double[] xValues, double[] yValues, Color lineColor, int lineThickness)
         {
@@ -483,7 +497,7 @@ namespace KerbalGraph
                 return;
             }
 
-            KerbalGraphLine newLine = new KerbalGraphLine((int)displayRect.width, (int)displayRect.height);
+            KerbalGraphLine newLine = new KerbalGraphLine((int)drawRect.width, (int)drawRect.height);
             newLine.InputData(xValues, yValues);
             newLine.SetBoundaries(bounds);
             newLine.lineColor = lineColor;
@@ -513,7 +527,7 @@ namespace KerbalGraph
 
         public void Clear()
         {
-            foreach (KeyValuePair<string,KerbalGraphLine> line in allLines)
+            foreach (KeyValuePair<string, KerbalGraphLine> line in allLines)
             {
                 line.Value.ClearTextures();
             }
@@ -626,92 +640,124 @@ namespace KerbalGraph
             }
         }
 
+        //
+        private void modifyDisplayRect(Rect newDisplayRect)
+        {
+            if (newDisplayRect != displayRect && newDisplayRect.width > 1 && newDisplayRect.height > 1 && refreshFlag)
+            {
+                displayRect = newDisplayRect;
+                Debug.Log("Modified displayRect: " + displayRect);
+                refreshFlag = false;
+            }
+
+
+
+        }
 
         #endregion
 
 
 
         /// <summary>
-        /// This displays the graph
+        /// This displays the graph.
         /// </summary>
-        public void Display(GUIStyle AreaStyle, int horizontalBorder, int verticalBorder)
+        public void Display(params GUILayoutOption[] options)
         {
-            ScrollView = GUILayout.BeginScrollView(ScrollView, false, false);
+            const int axisDisplaySize = 30;
+            //const int prespaceX = 20;
+            //const int prespaceY = 15;
+            const int legendSpacing = 20;
+
             GUIStyle BackgroundStyle = new GUIStyle(GUI.skin.box);
             BackgroundStyle.hover = BackgroundStyle.active = BackgroundStyle.normal;
-
-            GUILayout.Space(verticalBorder);
-            //Vertical axis and labels
-
-            GUILayout.BeginVertical();
-            GUILayout.BeginArea(new Rect(20 + horizontalBorder, 15 + verticalBorder, 30, displayRect.height + 2 * verticalBorder));
-
             GUIStyle LabelStyle = new GUIStyle(GUI.skin.label);
             LabelStyle.alignment = TextAnchor.UpperCenter;
 
-            GUILayout.Label(topBound, LabelStyle, GUILayout.Height(20), GUILayout.ExpandWidth(true));
-            int pixelspace = (int)displayRect.height / 2 - 72;
-            GUILayout.Space(pixelspace);
-            GUILayout.Label(verticalLabel, LabelStyle, GUILayout.Height(100), GUILayout.ExpandWidth(true));
-            GUILayout.Space(pixelspace);
-            GUILayout.Label(bottomBound, LabelStyle, GUILayout.Height(20), GUILayout.ExpandWidth(true));
+            Rect r = GUILayoutUtility.GetRect(10, 9999, 10, 9999, options);
+            Rect dr = new Rect(0, 0, r.width - 90, r.height - 45);
+            modifyDisplayRect(dr);
 
-            GUILayout.EndArea();
-            GUILayout.EndVertical();
+            int pixelspaceX = (int)displayRect.width / 2 - 102;
+            int pixelspaceY = (int)displayRect.height / 2 - 72;
 
-
-            //Graph itself
-
-            GUILayout.BeginVertical();
-            Rect areaRect = new Rect(50 + horizontalBorder, 15 + verticalBorder, displayRect.width + 2 * horizontalBorder, displayRect.height + 2 * verticalBorder);
-            GUILayout.BeginArea(areaRect);
-
-            GUI.DrawTexture(displayRect, graph);
-            foreach (KeyValuePair<string, KerbalGraphLine> pair in allLines)
-                GUI.DrawTexture(displayRect, pair.Value.Line());
-            GUILayout.EndArea();
-
-            //Horizontal Axis and Labels
-
-            GUILayout.BeginArea(new Rect(50 + horizontalBorder, displayRect.height + verticalBorder + 15, displayRect.width + 2 * horizontalBorder, 30));
-            GUILayout.BeginHorizontal(GUILayout.Width(displayRect.width));
-
-
-            GUILayout.Label(leftBound, LabelStyle, GUILayout.Width(20), GUILayout.ExpandWidth(true));
-            pixelspace = (int)displayRect.width / 2 - 102;
-            GUILayout.Space(pixelspace);
-            GUILayout.Label(horizontalLabel, LabelStyle, GUILayout.Width(160));
-            GUILayout.Space(pixelspace);
-            GUILayout.Label(rightBound, LabelStyle, GUILayout.Width(20), GUILayout.ExpandWidth(true));
-
-            GUILayout.EndHorizontal();
-            GUILayout.EndArea();
-            GUILayout.EndVertical();
-
-            GUILayout.BeginVertical();
-
-            //Legend Area
-
-            int movementdownwards = ((int)displayRect.height - allLines.Count * 20)/2;
-            foreach (KeyValuePair<string, KerbalGraphLine> pair in allLines)
+            ScrollView = GUILayout.BeginScrollView(ScrollView, false, false);
             {
-                if (!pair.Value.displayInLegend)
-                    continue;
+                //GUILayout.Space(verticalBorder);
+                GUILayout.BeginHorizontal(options);
+                {
+                    //Vertical axis and labels
+                    //GUILayout.Space(prespaceX);
+                    GUILayout.BeginVertical(GUILayout.Width(axisDisplaySize), GUILayout.Height(displayRect.height));
+                    //GUILayout.BeginArea(new Rect(prespaceX, prespaceY, axisDisplaySize, displayRect.height));
+                    {
+                        GUILayout.Label(topBound, LabelStyle, GUILayout.Height(20), GUILayout.ExpandWidth(true));
+                        GUILayout.Space(pixelspaceY);
+                        GUILayout.Label(verticalLabel, LabelStyle, GUILayout.Height(100), GUILayout.ExpandWidth(true));
+                        GUILayout.Space(pixelspaceY);
+                        GUILayout.Label(bottomBound, LabelStyle, GUILayout.Height(20), GUILayout.ExpandWidth(true));
+                    }
+                    // GUILayout.EndArea();
+                    GUILayout.EndVertical();
 
-                GUILayout.BeginArea(new Rect(60 + displayRect.width + 2 * horizontalBorder, 15 + verticalBorder + movementdownwards, 25, 15));
-                GUI.DrawTexture(new Rect(1, 1, 25, 15), pair.Value.LegendImage());
-                GUILayout.EndArea();
-                GUILayout.BeginArea(new Rect(85 + displayRect.width + 2 * horizontalBorder, 15 + verticalBorder + movementdownwards, 35, 15));
-                GUILayout.Label(pair.Key, LabelStyle);
-                GUILayout.EndArea();
-                movementdownwards += 20;
+
+                    //Graph itself
+
+                    GUILayout.BeginVertical(GUILayout.Width(displayRect.width), GUILayout.Height(displayRect.height + axisDisplaySize));
+
+                    {
+                        //GUILayout.BeginArea(new Rect(prespaceX + axisDisplaySize, prespaceY, displayRect.width, displayRect.height));
+                        {
+                            r = GUILayoutUtility.GetRect(displayRect.width, displayRect.height);
+                            GUI.DrawTexture(r, graph);
+                            foreach (KeyValuePair<string, KerbalGraphLine> pair in allLines)
+                                GUI.DrawTexture(r, pair.Value.Line());
+                        }
+                        // GUILayout.EndArea();
+                        //Horizontal Axis and Labels
+
+                        GUILayout.BeginHorizontal(GUILayout.Width(displayRect.width));
+                        //GUILayout.BeginArea(new Rect(prespaceX + axisDisplaySize, prespaceY + displayRect.height, displayRect.width, axisDisplaySize));
+                        {
+
+                            GUILayout.Label(leftBound, LabelStyle, GUILayout.Width(20), GUILayout.ExpandWidth(true));
+                            GUILayout.Space(pixelspaceX);
+                            GUILayout.Label(horizontalLabel, LabelStyle, GUILayout.Width(160));
+                            GUILayout.Space(pixelspaceX);
+                            GUILayout.Label(rightBound, LabelStyle, GUILayout.Width(20), GUILayout.ExpandWidth(true));
+
+                        }
+                        // GUILayout.EndArea();
+                        GUILayout.EndHorizontal();
+                    }
+                    GUILayout.EndVertical();
+                    GUILayout.Space(10);
+                    GUILayout.BeginVertical();
+                    {
+                        //Legend Area
+
+                        int startingSpace = ((int)displayRect.height - allLines.Count * legendSpacing) / 2;
+                        GUILayout.Space(startingSpace);
+                        foreach (KeyValuePair<string, KerbalGraphLine> pair in allLines)
+                        {
+                            if (!pair.Value.displayInLegend)
+                                continue;
+                            GUILayout.BeginHorizontal(GUILayout.Height(15));
+                            GUI.DrawTexture(new Rect(1, 1, 25, 15), pair.Value.LegendImage());
+                            GUILayout.Label(pair.Key, LabelStyle, GUILayout.Width(35));
+                            GUILayout.EndHorizontal();
+                            GUILayout.Space(5);
+                        }
+                    }
+                    GUILayout.EndVertical();
+
+                    int rightofarea = (int)displayRect.width + 30;
+                    int bottomofarea = (int)displayRect.height + 30;
+
+                    //GUILayout.Space(bottomofarea);
+                }
+                GUILayout.EndHorizontal();
             }
-            GUILayout.EndVertical();
-
-            int rightofarea = (int)displayRect.width + 2 * horizontalBorder + 30;
-            int bottomofarea = (int)displayRect.height + 2 * verticalBorder + 30;
-
-            GUILayout.Space(bottomofarea);
+            //GUILayout.EndArea();
             GUILayout.EndScrollView();
 
         }
