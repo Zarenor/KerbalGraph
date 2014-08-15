@@ -313,8 +313,8 @@ namespace KerbalGraph
         public bool autoscale = false;
 
         public Color backgroundColor = Color.black;
-        public Color gridColor = new Color(0.42f, 0.35f, 0.11f, 1);
-        public Color axisColor = Color.white;
+        public Color gridColor = new Color(0.2f, 0.2f, 0.2f); //new Color(0.42f, 0.35f, 0.11f, 1);
+        public Color axisColor = new Color(0.8f, 0.8f, 0.8f); //Color.white;
 
         private string leftBound;
         private string rightBound;
