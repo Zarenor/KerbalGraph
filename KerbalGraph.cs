@@ -273,6 +273,21 @@ namespace KerbalGraph
                 lineDisplay = null;
                 lineLegend = null;
             }
+
+            public int GetNumDataPoints()
+            {
+                return rawDataX.Length;
+            }
+
+            public double[] GetRawDataX()
+            {
+                return rawDataX;
+            }
+
+            public double[] GetRawDataY()
+            {
+                return rawDataY;
+            }
         }
 
 
@@ -660,11 +675,43 @@ namespace KerbalGraph
 
         public void DumpDataToCSV(string fileName, List<string> linesToDump)
         {
+            List<string> columnHeadings = new List<string>();
+            List<KerbalGraphLine> linesToPrint = new List<KerbalGraphLine>();
 
+            foreach (string lineName in linesToDump)
+            {
+                linesToPrint.Add(allLines[lineName]);
+                columnHeadings.Add(horizontalLabel);
+                columnHeadings.Add(lineName);
+            }
 
+            int maxNumElements = 0;
 
+            foreach(KerbalGraphLine line in linesToPrint)
+            {
+                maxNumElements = Math.Max(maxNumElements, line.GetNumDataPoints());
+            }
 
+            double[,] dataArray = new double[2 * linesToPrint.Count, maxNumElements];
 
+            int colIndex = 0;
+
+            foreach(KerbalGraphLine line in linesToPrint)
+            {
+                double[] rawX = line.GetRawDataX();
+                double[] rawY = line.GetRawDataY();
+
+                for(int i = 0; i < rawX.Length; i++)
+                {
+                    dataArray[colIndex, i] = rawX[i];
+                    dataArray[colIndex + 1, i] = rawY[i];
+                }
+                colIndex += 2;
+            }
+
+            string fileNameAndPath = "GameData/KerbalGraph/" + fileName;
+
+            KerbalGraphIO.WriteToFile(fileNameAndPath, columnHeadings, dataArray);
         }
 
         #endregion
