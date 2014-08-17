@@ -721,6 +721,10 @@ namespace KerbalGraph
         /// </summary>
         public void Display(params GUILayoutOption[] options)
         {
+
+
+            ScrollView = GUILayout.BeginScrollView(ScrollView, false, false, options);
+
             const int axisDisplaySize = 30;
             //const int prespaceX = 20;
             //const int prespaceY = 15;
@@ -736,25 +740,24 @@ namespace KerbalGraph
             modifyDisplayRect(dr);
 
             int pixelspaceX = (int)displayRect.width / 2 - 102;
-            int pixelspaceY = (int)displayRect.height / 2 - 72;
-
-            ScrollView = GUILayout.BeginScrollView(ScrollView, false, false);
-            {
+            int pixelspaceY = (int)displayRect.height / 2 - 72;            
+            
+            //{
                 //GUILayout.Space(verticalBorder);
-                GUILayout.BeginHorizontal(options);
-                {
+                GUILayout.BeginHorizontal();
+                //{
                     //Vertical axis and labels
                     //GUILayout.Space(prespaceX);
                     GUILayout.BeginVertical(GUILayout.Width(axisDisplaySize), GUILayout.Height(displayRect.height));
                     //GUILayout.BeginArea(new Rect(prespaceX, prespaceY, axisDisplaySize, displayRect.height));
-                    {
+                    //{
                         GUILayout.Label(topBound, LabelStyle, GUILayout.Height(20), GUILayout.ExpandWidth(true));
                         GUILayout.Space(pixelspaceY);
                         GUILayout.Label(verticalLabel, LabelStyle, GUILayout.Height(100), GUILayout.ExpandWidth(true));
                         GUILayout.Space(pixelspaceY);
                         GUILayout.Label(bottomBound, LabelStyle, GUILayout.Height(20), GUILayout.ExpandWidth(true));
-                    }
-                    // GUILayout.EndArea();
+                    //}
+                    //GUILayout.EndArea();
                     GUILayout.EndVertical();
 
 
@@ -762,20 +765,20 @@ namespace KerbalGraph
 
                     GUILayout.BeginVertical(GUILayout.Width(displayRect.width), GUILayout.Height(displayRect.height + axisDisplaySize));
 
-                    {
+                    //{
                         //GUILayout.BeginArea(new Rect(prespaceX + axisDisplaySize, prespaceY, displayRect.width, displayRect.height));
-                        {
+                        //{
                             r = GUILayoutUtility.GetRect(displayRect.width, displayRect.height);
                             GUI.DrawTexture(r, graph);
                             foreach (KeyValuePair<string, KerbalGraphLine> pair in allLines)
                                 GUI.DrawTexture(r, pair.Value.Line());
-                        }
-                        // GUILayout.EndArea();
+                        //}
+                        //GUILayout.EndArea();
                         //Horizontal Axis and Labels
 
                         GUILayout.BeginHorizontal(GUILayout.Width(displayRect.width));
                         //GUILayout.BeginArea(new Rect(prespaceX + axisDisplaySize, prespaceY + displayRect.height, displayRect.width, axisDisplaySize));
-                        {
+                        //{
 
                             GUILayout.Label(leftBound, LabelStyle, GUILayout.Width(20), GUILayout.ExpandWidth(true));
                             GUILayout.Space(pixelspaceX);
@@ -783,14 +786,14 @@ namespace KerbalGraph
                             GUILayout.Space(pixelspaceX);
                             GUILayout.Label(rightBound, LabelStyle, GUILayout.Width(20), GUILayout.ExpandWidth(true));
 
-                        }
-                        // GUILayout.EndArea();
+                        //}
+                        //GUILayout.EndArea();
                         GUILayout.EndHorizontal();
-                    }
+                    //}
                     GUILayout.EndVertical();
                     GUILayout.Space(10);
                     GUILayout.BeginVertical();
-                    {
+                    //{
                         //Legend Area
 
                         int startingSpace = ((int)displayRect.height - allLines.Count * legendSpacing) / 2;
@@ -800,21 +803,21 @@ namespace KerbalGraph
                             if (!pair.Value.displayInLegend)
                                 continue;
                             GUILayout.BeginHorizontal(GUILayout.Height(15));
-                            GUI.DrawTexture(new Rect(1, 1, 25, 15), pair.Value.LegendImage());
+                            GUI.DrawTexture(GUILayoutUtility.GetRect(25, 15), pair.Value.LegendImage());
                             GUILayout.Label(pair.Key, LabelStyle, GUILayout.Width(35));
                             GUILayout.EndHorizontal();
                             GUILayout.Space(5);
                         }
-                    }
+                    //}
                     GUILayout.EndVertical();
 
                     int rightofarea = (int)displayRect.width + 30;
                     int bottomofarea = (int)displayRect.height + 30;
 
                     //GUILayout.Space(bottomofarea);
-                }
+                //}
                 GUILayout.EndHorizontal();
-            }
+            //}
             //GUILayout.EndArea();
             GUILayout.EndScrollView();
 
