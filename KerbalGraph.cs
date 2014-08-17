@@ -721,10 +721,6 @@ namespace KerbalGraph
         /// </summary>
         public void Display(params GUILayoutOption[] options)
         {
-
-
-            ScrollView = GUILayout.BeginScrollView(ScrollView, false, false, options);
-
             const int axisDisplaySize = 30;
             //const int prespaceX = 20;
             //const int prespaceY = 15;
@@ -735,13 +731,14 @@ namespace KerbalGraph
             GUIStyle LabelStyle = new GUIStyle(GUI.skin.label);
             LabelStyle.alignment = TextAnchor.UpperCenter;
 
-            Rect r = GUILayoutUtility.GetRect(10, 9999, 10, 9999, options);
+            Rect r = GUILayoutUtility.GetRect(10, 9999, 10, 9999, options);         //This creates a blank bit of space as large as this rect that pushes the rest of the stuff away; needs to be replaced with something that doesn't do that
             Rect dr = new Rect(0, 0, r.width - 90, r.height - 45);
             modifyDisplayRect(dr);
 
             int pixelspaceX = (int)displayRect.width / 2 - 102;
-            int pixelspaceY = (int)displayRect.height / 2 - 72;            
-            
+            int pixelspaceY = (int)displayRect.height / 2 - 72;
+
+            ScrollView = GUILayout.BeginScrollView(ScrollView, false, false, options);
             //{
                 //GUILayout.Space(verticalBorder);
                 GUILayout.BeginHorizontal();
