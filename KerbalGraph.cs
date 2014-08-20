@@ -304,9 +304,6 @@ namespace KerbalGraph
         /// </summary>
         protected Rect displayRect = new Rect(0, 0, 0, 0);
 
-        private bool refreshFlag = true;
-
-
         private Dictionary<string, KerbalGraphLine> allLines = new Dictionary<string, KerbalGraphLine>();
 
         private Vector4d bounds;
@@ -734,10 +731,11 @@ namespace KerbalGraph
             GUILayout.BeginVertical(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
 
             GUILayout.Box(GUIContent.none, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-            displayRect = GUILayoutUtility.GetLastRect();
+            UpdateDisplayRect(GUILayoutUtility.GetLastRect());
             GUI.DrawTexture(displayRect, graph);
             foreach (KeyValuePair<string, KerbalGraphLine> pair in allLines)
                 GUI.DrawTexture(displayRect, pair.Value.Line());
+            Debug.Log("[KG] displayRect: " + displayRect);
 
             //Horizontal Axis and Labels
             GUILayout.BeginHorizontal(GUILayout.Height(axisDisplaySize), GUILayout.ExpandWidth(true));
@@ -773,6 +771,19 @@ namespace KerbalGraph
             GUILayout.EndHorizontal();
             //GUILayout.EndScrollView();
 
+        }
+
+        /// <summary>
+        /// This function filters out rectangles unity supplies during the layout process that are invalid, 
+        /// so that displayRect only contains valid rectangles.
+        /// </summary>
+        /// <param name="dr">The rectangle to be tested, and if valid, saved to displayRect and used.</param>
+        private void UpdateDisplayRect(Rect dr)
+        {
+            if ((dr.x > 0 || dr.y > 0 || dr.height > 1 || dr.width > 1) && (dr.height > 0 && dr.width > 0))
+            {
+                displayRect = dr;
+            }
         }
 
     }
