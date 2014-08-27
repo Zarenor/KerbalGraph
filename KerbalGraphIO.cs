@@ -21,9 +21,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
+using UnityEngine;
 
 namespace KerbalGraph
 {
@@ -40,38 +41,51 @@ namespace KerbalGraph
         /// <param name="dataColumnRow">A two-dimensional array, organized so that first index specifies which data variable while the other goes through all available points of that data</param>
         public static void WriteToFile(string fileNameAndPath, List<string> columnHeadings, double[,] dataColumnRow)
         {
-            //Open the filestream
-            FileStream fs = File.Open(KSPUtil.ApplicationRootPath.Replace("\\", "/") + fileNameAndPath, FileMode.Create, FileAccess.Write);
-            StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8);
-
-            //Write the column headings
-            string tmp_s = "";
-            foreach(string s in columnHeadings)
+            try
             {
-                tmp_s += s + ", ";
-            }
-            sw.WriteLine(tmp_s);
+                //Open the filestream
+                FileStream fs = File.Open(KSPUtil.ApplicationRootPath.Replace("\\", "/") + fileNameAndPath, FileMode.Create, FileAccess.Write);
+                StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8);
 
-            int numColumns = dataColumnRow.GetLength(0);
-            int numRows = dataColumnRow.GetLength(1);
-
-            //Dump data to file
-            for (int i = 0; i < numColumns; i++)
-            {
-                for (int j = 0; j < numRows; j++)
+                //Write the column headings
+                string tmp_s = "";
+                foreach (string s in columnHeadings)
                 {
-                    sw.Write(dataColumnRow[i, j]);
-                    if (i == numRows - 1)
-                        sw.Write("\r\n");
-                    else
-                        sw.Write(", ");
+                    tmp_s += Regex.Replace(s, "[,\t]", " ") + ", ";
                 }
-            }
+                sw.WriteLine(tmp_s);
 
-            //Cleanup
-            sw.Close();
-            sw = null;
-            fs = null;
+                int numColumns = dataColumnRow.GetUpperBound(0);
+                int numRows = dataColumnRow.GetUpperBound(1);
+
+                //Dump data to file
+                for (int i = 0; i < numRows; i++)
+                {
+                    for (int j = 0; j < numColumns; j++)
+                    {
+                        sw.Write(dataColumnRow[j, i].ToString());
+                        if (j == numColumns - 1)
+                            sw.Write("\r\n");
+                        else
+                            sw.Write(", ");
+                    }
+                }
+
+                //Cleanup
+                sw.Close();
+                sw = null;
+                fs = null;
+            }
+            catch(IOException e)
+            {
+                if (e.Message.Contains("Sharing violation"))
+                    PopupDialog.SpawnPopupDialog("File Already In Use!", "Please close the program using the data file and try again", "OK", false, HighLogic.Skin);
+                Debug.LogException(e);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
         }
     }
 }

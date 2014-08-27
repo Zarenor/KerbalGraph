@@ -657,13 +657,59 @@ namespace KerbalGraph
 
         #region Data Dump Functions
 
+        /// <summary>
+        /// Dumps all lines to a file at a the default GameData/KerbalGraph/ path
+        /// </summary>
+        /// <param name="fileName">The file name; must include file type: ex: KerbalGraphStuff.csv</param>
+        public void DumpDataToCSV(string fileName)
+        {
+            List<string> linesToDump = new List<string>();
+            foreach(KeyValuePair<string, KerbalGraphLine> line in allLines)
+            {
+                linesToDump.Add(line.Key);
+            }
+            DumpDataToCSV(fileName, linesToDump);
+        }
+
+        /// <summary>
+        /// Dumps all lines to a file at a specific path
+        /// </summary>
+        /// <param name="pathName">The file path; must end with a slash: ex: GameData/KerbalGraph/</param>
+        /// <param name="fileName">The file name; must include file type: ex: KerbalGraphStuff.csv</param>
+        public void DumpDataToCSV(string pathName, string fileName)
+        {
+            List<string> linesToDump = new List<string>();
+            foreach (KeyValuePair<string, KerbalGraphLine> line in allLines)
+            {
+                linesToDump.Add(line.Key);
+            }
+            DumpDataToCSV(pathName, fileName, linesToDump);
+        }
+
+        /// <summary>
+        /// Dumps a set number of lines to a file at the default GameData/KerbalGraph path
+        /// </summary>
+        /// <param name="fileName">The file name; must include file type: ex: KerbalGraphStuff.csv</param>
+        /// <param name="linesToDump">A list of the lines to dump; is case-sensitive</param>
         public void DumpDataToCSV(string fileName, List<string> linesToDump)
+        {
+            DumpDataToCSV("GameData/KerbalGraph/", fileName, linesToDump);
+        }
+
+        /// <summary>
+        /// Dumps a set number of lines to a file at a specific path
+        /// </summary>
+        /// <param name="pathName">The file path; must end with a slash: ex: GameData/KerbalGraph/</param>
+        /// <param name="fileName">The file name; must include file type: ex: KerbalGraphStuff.csv</param>
+        /// <param name="linesToDump">A list of the lines to dump; is case-sensitive</param>
+        public void DumpDataToCSV(string pathName, string fileName, List<string> linesToDump)
         {
             List<string> columnHeadings = new List<string>();
             List<KerbalGraphLine> linesToPrint = new List<KerbalGraphLine>();
 
-            foreach (string lineName in linesToDump)
+            for (int i = 0; i < linesToDump.Count; i++)
             {
+                string lineName = linesToDump[i];
                 linesToPrint.Add(allLines[lineName]);
                 columnHeadings.Add(horizontalLabel);
                 columnHeadings.Add(lineName);
@@ -671,8 +717,9 @@ namespace KerbalGraph
 
             int maxNumElements = 0;
 
-            foreach (KerbalGraphLine line in linesToPrint)
+            for (int i = 0; i < linesToDump.Count; i++)
             {
+                KerbalGraphLine line = linesToPrint[i];
                 maxNumElements = Math.Max(maxNumElements, line.GetNumDataPoints());
             }
 
@@ -680,20 +727,21 @@ namespace KerbalGraph
 
             int colIndex = 0;
 
-            foreach (KerbalGraphLine line in linesToPrint)
+            for (int i = 0; i < linesToDump.Count; i++)
             {
+                KerbalGraphLine line = linesToPrint[i];
                 double[] rawX = line.GetRawDataX();
                 double[] rawY = line.GetRawDataY();
 
-                for (int i = 0; i < rawX.Length; i++)
+                for (int j = 0; j < rawX.Length; j++)
                 {
-                    dataArray[colIndex, i] = rawX[i];
-                    dataArray[colIndex + 1, i] = rawY[i];
+                    dataArray[colIndex, j] = rawX[j];
+                    dataArray[colIndex + 1, j] = rawY[j];
                 }
                 colIndex += 2;
             }
 
-            string fileNameAndPath = "GameData/KerbalGraph/" + fileName;
+            string fileNameAndPath = pathName + fileName;
 
             KerbalGraphIO.WriteToFile(fileNameAndPath, columnHeadings, dataArray);
         }
@@ -735,7 +783,7 @@ namespace KerbalGraph
             GUI.DrawTexture(displayRect, graph);
             foreach (KeyValuePair<string, KerbalGraphLine> pair in allLines)
                 GUI.DrawTexture(displayRect, pair.Value.Line());
-            Debug.Log("[KG] displayRect: " + displayRect);
+            //Debug.Log("[KG] displayRect: " + displayRect);
 
             //Horizontal Axis and Labels
             GUILayout.BeginHorizontal(GUILayout.Height(axisDisplaySize), GUILayout.ExpandWidth(true));
