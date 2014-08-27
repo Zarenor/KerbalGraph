@@ -21,9 +21,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace KerbalGraph
 {
@@ -52,16 +52,16 @@ namespace KerbalGraph
             }
             sw.WriteLine(tmp_s);
 
-            int numColumns = dataColumnRow.GetLength(0);
-            int numRows = dataColumnRow.GetLength(1);
+            int numColumns = dataColumnRow.GetUpperBound(0);
+            int numRows = dataColumnRow.GetUpperBound(1);
 
             //Dump data to file
-            for (int i = 0; i < numColumns; i++)
+            for (int i = 0; i < numRows; i++)
             {
-                for (int j = 0; j < numRows; j++)
+                for (int j = 0; j < numColumns; j++)
                 {
-                    sw.Write(dataColumnRow[i, j]);
-                    if (i == numRows - 1)
+                    sw.Write(Regex.Replace(dataColumnRow[j, i].ToString(), ",", "\t"));
+                    if (j == numColumns - 1)
                         sw.Write("\r\n");
                     else
                         sw.Write(", ");

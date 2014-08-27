@@ -748,7 +748,7 @@ namespace KerbalGraph
             GUI.DrawTexture(displayRect, graph);
             foreach (KeyValuePair<string, KerbalGraphLine> pair in allLines)
                 GUI.DrawTexture(displayRect, pair.Value.Line());
-            Debug.Log("[KG] displayRect: " + displayRect);
+            //Debug.Log("[KG] displayRect: " + displayRect);
 
             //Horizontal Axis and Labels
             GUILayout.BeginHorizontal(GUILayout.Height(axisDisplaySize), GUILayout.ExpandWidth(true));
