@@ -657,6 +657,10 @@ namespace KerbalGraph
 
         #region Data Dump Functions
 
+        /// <summary>
+        /// Dumps all lines to a file at a the default GameData/KerbalGraph/ path
+        /// </summary>
+        /// <param name="fileName">The file name; must include file type: ex: KerbalGraphStuff.csv</param>
         public void DumpDataToCSV(string fileName)
         {
             List<string> linesToDump = new List<string>();
@@ -667,7 +671,38 @@ namespace KerbalGraph
             DumpDataToCSV(fileName, linesToDump);
         }
 
+        /// <summary>
+        /// Dumps all lines to a file at a specific path
+        /// </summary>
+        /// <param name="pathName">The file path; must end with a slash: ex: GameData/KerbalGraph/</param>
+        /// <param name="fileName">The file name; must include file type: ex: KerbalGraphStuff.csv</param>
+        public void DumpDataToCSV(string pathName, string fileName)
+        {
+            List<string> linesToDump = new List<string>();
+            foreach (KeyValuePair<string, KerbalGraphLine> line in allLines)
+            {
+                linesToDump.Add(line.Key);
+            }
+            DumpDataToCSV(pathName, fileName, linesToDump);
+        }
+
+        /// <summary>
+        /// Dumps a set number of lines to a file at the default GameData/KerbalGraph path
+        /// </summary>
+        /// <param name="fileName">The file name; must include file type: ex: KerbalGraphStuff.csv</param>
+        /// <param name="linesToDump">A list of the lines to dump; is case-sensitive</param>
         public void DumpDataToCSV(string fileName, List<string> linesToDump)
+        {
+            DumpDataToCSV("GameData/KerbalGraph/", fileName, linesToDump);
+        }
+
+        /// <summary>
+        /// Dumps a set number of lines to a file at a specific path
+        /// </summary>
+        /// <param name="pathName">The file path; must end with a slash: ex: GameData/KerbalGraph/</param>
+        /// <param name="fileName">The file name; must include file type: ex: KerbalGraphStuff.csv</param>
+        /// <param name="linesToDump">A list of the lines to dump; is case-sensitive</param>
+        public void DumpDataToCSV(string pathName, string fileName, List<string> linesToDump)
         {
             List<string> columnHeadings = new List<string>();
             List<KerbalGraphLine> linesToPrint = new List<KerbalGraphLine>();
@@ -706,7 +741,7 @@ namespace KerbalGraph
                 colIndex += 2;
             }
 
-            string fileNameAndPath = "GameData/KerbalGraph/" + fileName;
+            string fileNameAndPath = pathName + fileName;
 
             KerbalGraphIO.WriteToFile(fileNameAndPath, columnHeadings, dataArray);
         }
