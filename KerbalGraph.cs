@@ -657,13 +657,24 @@ namespace KerbalGraph
 
         #region Data Dump Functions
 
+        public void DumpDataToCSV(string fileName)
+        {
+            List<string> linesToDump = new List<string>();
+            foreach(KeyValuePair<string, KerbalGraphLine> line in allLines)
+            {
+                linesToDump.Add(line.Key);
+            }
+            DumpDataToCSV(fileName, linesToDump);
+        }
+
         public void DumpDataToCSV(string fileName, List<string> linesToDump)
         {
             List<string> columnHeadings = new List<string>();
             List<KerbalGraphLine> linesToPrint = new List<KerbalGraphLine>();
 
-            foreach (string lineName in linesToDump)
+            for (int i = 0; i < linesToDump.Count; i++)
             {
+                string lineName = linesToDump[i];
                 linesToPrint.Add(allLines[lineName]);
                 columnHeadings.Add(horizontalLabel);
                 columnHeadings.Add(lineName);
@@ -671,8 +682,9 @@ namespace KerbalGraph
 
             int maxNumElements = 0;
 
-            foreach (KerbalGraphLine line in linesToPrint)
+            for (int i = 0; i < linesToDump.Count; i++)
             {
+                KerbalGraphLine line = linesToPrint[i];
                 maxNumElements = Math.Max(maxNumElements, line.GetNumDataPoints());
             }
 
@@ -680,15 +692,16 @@ namespace KerbalGraph
 
             int colIndex = 0;
 
-            foreach (KerbalGraphLine line in linesToPrint)
+            for (int i = 0; i < linesToDump.Count; i++)
             {
+                KerbalGraphLine line = linesToPrint[i];
                 double[] rawX = line.GetRawDataX();
                 double[] rawY = line.GetRawDataY();
 
-                for (int i = 0; i < rawX.Length; i++)
+                for (int j = 0; j < rawX.Length; j++)
                 {
-                    dataArray[colIndex, i] = rawX[i];
-                    dataArray[colIndex + 1, i] = rawY[i];
+                    dataArray[colIndex, j] = rawX[j];
+                    dataArray[colIndex + 1, j] = rawY[j];
                 }
                 colIndex += 2;
             }
